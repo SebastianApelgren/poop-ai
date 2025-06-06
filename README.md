@@ -13,4 +13,5 @@ Skriv dom kommanderna nedaför i en terminal i Visual Studio Code:
 ### pip install -r requirements.txt
 
 
-Du måste sen också dubbeltrycka på data.zip för att få ut datan
+Du måste sen också dubbeltrycka på data.zip för att få ut "data" mappen.
+
