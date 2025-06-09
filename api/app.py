@@ -11,7 +11,7 @@ from PIL import Image
 from torchvision import transforms, models
 
 # ─── CONFIGURATION ─────────────────────────────────────────────────────────────
-DATA_DIR   = "./data"                 # not used here, but kept for reference
+DATA_DIR   = "./data_classes"                 # not used here, but kept for reference
 MODEL_PATH = "./stool_model.pth"      # Path to your saved .pth file
 IMG_SIZE   = 224
 NUM_CLASSES = 7
@@ -48,7 +48,10 @@ transform = transforms.Compose([
 app = FastAPI()
 
 # Precompute class labels sorted alphabetically
-class_labels = sorted(os.listdir(DATA_DIR))  # e.g., ["type-1", "type-2", ..., "type-7"]
+class_labels = [
+    "type-1", "type-2", "type-3", "type-4",
+    "type-5", "type-6", "type-7"
+]
 
 @app.post("/predict")
 async def predict(image_file: UploadFile = File(...)):
