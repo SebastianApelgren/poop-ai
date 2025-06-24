@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stool Classification API - Frontend Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #007bff;
+        }
+
+        .upload-section.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-button:hover {
+            background-color: #0056b3;
+        }
+
+        .upload-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .preview-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #imagePreview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .confidence-bar {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .stool-type-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+
+        .api-config {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+
+        .api-config input {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .api-config label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Stool Classification API Demo</h1>
+        
+        <div class="api-config">
+            <label for="apiUrl">API Base URL:</label>
+            <input type="text" id="apiUrl" value="http://localhost:5001" placeholder="http://localhost:5001">
+            <button onclick="testConnection()" class="upload-button">Test Connection</button>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <h3>📸 Upload Image for Classification</h3>
+            <p>Drag and drop an image here, or click the button below</p>
+            <input type="file" id="fileInput" accept="image/*">
+            <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                Choose Image File
+            </button>
+            <button class="upload-button" id="classifyButton" onclick="classifyImage()" disabled>
+                Classify Image
+            </button>
+        </div>
+
+        <div class="preview-section">
+            <img id="imagePreview" alt="Image preview">
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        const apiUrlInput = document.getElementById('apiUrl');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const classifyButton = document.getElementById('classifyButton');
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        const uploadSection = document.getElementById('uploadSection');
+
+        // Drag and drop functionality
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file.');
+                return;
+            }
+
+            selectedFile = file;
+            
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Enable classify button
+            classifyButton.disabled = false;
+            
+            // Clear previous results
+            hideResult();
+        }
+
+        async function classifyImage() {
+            if (!selectedFile) {
+                showError('Please select an image file first.');
+                return;
+            }
+
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                showError('Please enter a valid API URL.');
+                return;
+            }
+
+            // Show loading state
+            classifyButton.disabled = true;
+            classifyButton.textContent = 'Classifying...';
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('imageFile', selectedFile);
+
+                const response = await fetch(`${apiUrl}/classification/predict`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    showError(result.error);
+                } else {
+                    showSuccess(result);
+                }
+            } catch (error) {
+                showError(`Network error: ${error.message}`);
+            } finally {
+                classifyButton.disabled = false;
+                classifyButton.textContent = 'Classify Image';
+            }
+        }
+
+        function showLoading() {
+            resultSection.style.display = 'block';
+            resultSection.className = 'result-section';
+            resultContent.innerHTML = '<div class="loading">🔄 Processing image...</div>';
+        }
+
+        function showSuccess(result) {
+            resultSection.style.display = 'block';
+            resultSection.className = 'result-section result-success';
+            
+            const confidencePercent = (result.confidence * 100).toFixed(1);
+            const stoolTypeDescription = getStoolTypeDescription(result.predictedType);
+            
+            resultContent.innerHTML = `
+                <h3>✅ Classification Results</h3>
+                <p><strong>Predicted Type:</strong> ${result.predictedType}</p>
+                <p><strong>Confidence:</strong> ${confidencePercent}%</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+                </div>
+                <div class="stool-type-info">
+                    <h4>About ${result.predictedType}:</h4>
+                    <p>${stoolTypeDescription}</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            resultSection.style.display = 'block';
+            resultSection.className = 'result-section result-error';
+            resultContent.innerHTML = `
+                <h3>❌ Error</h3>
+                <p>${message}</p>
+            `;
+        }
+
+        function hideResult() {
+            resultSection.style.display = 'none';
+        }
+
+        function getStoolTypeDescription(type) {
+            const descriptions = {
+                'type-1': 'Separate hard lumps, like nuts (difficult to pass)',
+                'type-2': 'Sausage-like but lumpy',
+                'type-3': 'Sausage-like with cracks on the surface',
+                'type-4': 'Sausage-like, smooth and soft (ideal)',
+                'type-5': 'Soft blobs with clear-cut edges (easy to pass)',
+                'type-6': 'Mushy consistency with ragged edges',
+                'type-7': 'Entirely liquid, no solid pieces'
+            };
+            return descriptions[type] || 'Unknown stool type';
+        }
+
+        async function testConnection() {
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                showError('Please enter a valid API URL.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}/classification/predict`, {
+                    method: 'POST',
+                    body: new FormData()
+                });
+                
+                if (response.ok) {
+                    showError('Connection successful! API is running. (This is expected - no image was provided)');
+                } else {
+                    showError(`Connection failed. Status: ${response.status}`);
+                }
+            } catch (error) {
+                showError(`Connection failed: ${error.message}`);
+            }
+        }
+
+        // Load saved API URL from localStorage
+        const savedApiUrl = localStorage.getItem('classificationApiUrl');
+        if (savedApiUrl) {
+            apiUrlInput.value = savedApiUrl;
+        }
+
+        // Save API URL when changed
+        apiUrlInput.addEventListener('change', () => {
+            localStorage.setItem('classificationApiUrl', apiUrlInput.value);
+        });
+    </script>
+</body>
+</html> 
