@@ -15,6 +15,12 @@ namespace ClassificationApi.Controllers
             _classificationService = classificationService;
         }
 
+        [HttpGet("ping")]
+        public IActionResult Ping()
+        {
+            return Ok(new { message = "API is running", timestamp = DateTime.UtcNow });
+        }
+
         [HttpPost("predict")]
         public async Task<ClassificationResponse> Predict(IFormFile imageFile)
         {
