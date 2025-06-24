@@ -6,3 +6,11 @@ __pycache__/
 .ipynb_checkpoints/
 data/
 training_instruction.rtf
+
+# C-sharp and Visual Studio
+ClassificationApi/ClassificationApi/bin/*
+ClassificationApi/ClassificationApi/obj/*
+ClassificationApi/ClassificationApiTests/bin/*
+ClassificationApi/ClassificationApiTests/obj/*
+ClassificationApi/TestResults/*
+ClassificationApi/.vs
