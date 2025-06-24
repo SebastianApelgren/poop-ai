@@ -152,5 +152,31 @@ namespace ClassificationApiTests
             // Assert
             Assert.AreEqual("application/octet-stream", contentType);
         }
+
+        [TestMethod]
+        public void Frontend_Resource_IsCorrectlyDefined()
+        {
+            // Arrange
+            Resource frontend = Resource.Frontend.StoolClassificationFrontend;
+
+            // Act & Assert
+            Assert.AreEqual("Frontend/StoolClassificationFrontend.html", frontend.Path);
+            Assert.AreEqual("StoolClassificationFrontend.html", frontend.GetFileName());
+            Assert.AreEqual("Frontend/StoolClassificationFrontend.html", frontend.ToString());
+        }
+
+        [TestMethod]
+        public void Frontend_ContentType_IsCorrect()
+        {
+            // Arrange
+            ResourceHelper helper = ResourceHelper.Instance;
+            Resource frontend = Resource.Frontend.StoolClassificationFrontend;
+
+            // Act
+            string contentType = helper.GetContentType(frontend);
+
+            // Assert
+            Assert.AreEqual("text/html", contentType);
+        }
     }
 } 

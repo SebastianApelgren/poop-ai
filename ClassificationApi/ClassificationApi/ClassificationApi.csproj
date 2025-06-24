@@ -12,10 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Frontend\StoolClassificationFrontend.html" />
     <None Remove="Resources\stool_model.onnx" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Frontend\StoolClassificationFrontend.html" />
     <EmbeddedResource Include="Resources\Models\stool_model.onnx" />
   </ItemGroup>
 

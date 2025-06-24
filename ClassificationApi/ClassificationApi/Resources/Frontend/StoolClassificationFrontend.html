@@ -517,7 +517,7 @@
                 const formData = new FormData();
                 formData.append('imageFile', selectedFile);
 
-                const response = await fetch(`${apiUrl}/classification/predict`, {
+                const response = await fetch(`${apiUrl}/predict`, {
                     method: 'POST',
                     body: formData
                 });
@@ -598,7 +598,7 @@
             }
 
             try {
-                const response = await fetch(`${apiUrl}/classification/ping`);
+                const response = await fetch(`${apiUrl}/ping`);
                 
                 if (response.ok) {
                     const result = await response.json();

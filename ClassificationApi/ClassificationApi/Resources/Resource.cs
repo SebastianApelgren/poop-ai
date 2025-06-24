@@ -34,5 +34,10 @@
         {
             public static readonly Resource StoolModel = new Resource("Models/stool_model.onnx");
         }
+
+        public static class Frontend
+        {
+            public static readonly Resource StoolClassificationFrontend = new Resource("Frontend/StoolClassificationFrontend.html");
+        }
     }
 }

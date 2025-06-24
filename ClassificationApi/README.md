@@ -90,7 +90,23 @@ Or whatever you have it hosted at.
 
 ### Endpoints
 
-#### POST /classification/predict
+#### GET /
+
+Serves the embedded frontend HTML interface.
+
+#### GET /ping
+
+Tests API connectivity and returns server status.
+
+**Response:**
+```json
+{
+  "message": "API is running",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### POST /predict
 
 Classifies an uploaded image and returns the predicted stool type.
 
@@ -101,7 +117,7 @@ Classifies an uploaded image and returns the predicted stool type.
 
 **cURL Example:**
 ```bash
-curl -X POST "https://localhost:5001/classification/predict" \
+curl -X POST "https://localhost:5001/predict" \
   -H "Content-Type: multipart/form-data" \
   -F "imageFile=@path/to/your/image.jpg"
 ```
@@ -111,7 +127,7 @@ curl -X POST "https://localhost:5001/classification/predict" \
 const formData = new FormData();
 formData.append('imageFile', imageFile); // imageFile is a File object
 
-const response = await fetch('https://localhost:5001/classification/predict', {
+const response = await fetch('https://localhost:5001/predict', {
   method: 'POST',
   body: formData
 });
@@ -205,7 +221,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   formData.append('imageFile', file);
   
   try {
-    const response = await fetch('/classification/predict', {
+    const response = await fetch('/predict', {
       method: 'POST',
       body: formData
     });
@@ -254,7 +270,7 @@ function ImageClassifier() {
     formData.append('imageFile', file);
 
     try {
-      const response = await fetch('/classification/predict', {
+      const response = await fetch('/predict', {
         method: 'POST',
         body: formData,
       });
@@ -309,7 +325,7 @@ function ImageClassifier() {
 The API returns errors in the response body rather than HTTP error codes. Always check the `error` field:
 
 ```javascript
-const response = await fetch('/classification/predict', {
+const response = await fetch('/predict', {
   method: 'POST',
   body: formData
 });
@@ -372,7 +388,7 @@ dotnet test
 
 ### Manual Testing
 1. Start the API: `dotnet run --project ClassificationApi`
-2. Use tools like Postman or curl to test the `/classification/predict` endpoint
+2. Use tools like Postman or curl to test the `/predict` endpoint
 3. Upload various image formats and sizes to verify functionality
 
 ### Test Images
