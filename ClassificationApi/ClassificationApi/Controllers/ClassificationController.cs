@@ -23,8 +23,12 @@ namespace ClassificationApi.Controllers
             {
                 string htmlContent = ResourceHelper.Instance.ReadAsStringAsync(Resource.Frontend.StoolClassificationFrontend).Result;
                 
-                // Get the current request URL and replace the default API URL in the HTML
-                string requestUrl = $"{Request.Scheme}://{Request.Host}";
+                // Get the external URL from forwarded headers
+                string scheme = Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? Request.Scheme;
+                string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value;
+                string prefix = Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? "";
+                
+                string requestUrl = $"{scheme}://{host}{prefix}";
                 htmlContent = htmlContent.Replace("http://localhost:5001", requestUrl);
                 
                 return Content(htmlContent, "text/html");
