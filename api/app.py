@@ -20,7 +20,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # ─── MODEL DEFINITION ───────────────────────────────────────────────────────────
 def load_model():
-    model = models.efficientnet_b0(pretrained=False)
+    model = models.efficientnet_b0()
     in_features = model.classifier[1].in_features
     model.classifier = nn.Sequential(
         nn.Linear(in_features, 512),
@@ -76,4 +76,12 @@ async def predict(image_file: UploadFile = File(...)):
     return {
         "predicted_type": predicted_label,
         "confidence": confidence
+    }
+
+@app.post("/test_predict")
+async def test_predict(image_file: UploadFile = File(...)):
+    contents = await image_file.read()
+
+    return {
+        "message": "Test endpoint received the image file.",
     }
