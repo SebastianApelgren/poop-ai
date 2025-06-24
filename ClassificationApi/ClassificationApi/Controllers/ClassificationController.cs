@@ -23,8 +23,8 @@ namespace ClassificationApi.Controllers
             {
                 string htmlContent = ResourceHelper.Instance.ReadAsStringAsync(Resource.Frontend.StoolClassificationFrontend).Result;
                 
-                // Get the external URL from forwarded headers
-                string scheme = Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? Request.Scheme;
+                // Get the external URL from forwarded headers, but hardcode https
+                string scheme = "https"; // Hardcoded to fix mixed content
                 string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value;
                 string prefix = Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? "";
                 
