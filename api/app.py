@@ -57,16 +57,23 @@ class_labels = [
 async def predict(image_file: UploadFile = File(...)):
     # 1. Read the uploaded image file
     contents = await image_file.read()
+
+    print("Received image file, will process it now")
+
     image = Image.open(io.BytesIO(contents)).convert("RGB")
     
     # 2. Preprocess
     img_t = transform(image).unsqueeze(0).to(DEVICE)
+
+    print("Image shape after transform, will run inference now")
     
     # 3. Model inference
     with torch.no_grad():
         outputs = model(img_t)
         probs = F.softmax(outputs, dim=1)
         top_prob, top_cls = torch.max(probs, 1)
+
+    print("Model inference completed, will prepare response now")
     
     # 4. Map to label
     predicted_label = class_labels[top_cls.item()]
