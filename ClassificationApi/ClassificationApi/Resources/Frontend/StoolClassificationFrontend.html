@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stool Classification API - Frontend Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap');
+
+        :root {
+            font-family: 'Lexend', system-ui, Avenir, Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            line-height: 1.5;
+
+            color-scheme: light dark;
+            color: light-dark(var(--light-text-color), var(--dark-text-color));
+            background-color: light-dark(var(--light-background-color), var(--dark-background-color));
+
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+
+            --elevation-factor: 5;
+
+            --full-margin: 1rem;
+            --half-margin: 0.5rem;
+
+            --border-radius: 12px;
+
+            --max-content-width: 1280px;
+            --max-content-height: 720px;
+
+            --font-size-xs: 0.75rem;
+            --font-size-s: 0.875rem;
+            --font-size-m: 1rem;
+            --font-size-l: 1rem;
+            --font-size-xl: 1.25rem;
+            --font-size-xxl: 2rem;
+
+            --dark-background-color: #0d1219;
+            --light-background-color: #f2f6fa;
+
+            --dark-info-color: #008BD7;
+            --light-info-color: #009CE7;
+
+            --dark-success-color: #29903B;
+            --light-success-color: #1C8139;
+
+            --dark-warning-color: #E3B341;
+            --light-warning-color: #EAC54F;
+
+            --dark-danger-color: #B62324;
+            --light-danger-color: #A40E26;
+
+            --dark-clickable-shadow-color: rgba(255, 255, 255, 0.2);
+            --light-clickable-shadow-color: rgba(0, 0, 0, 0.2);
+
+            --dark-elevation-color-r: 52;
+            --dark-elevation-color-g: 72;
+            --dark-elevation-color-b: 101;
+
+            --light-elevation-color-r: 167;
+            --light-elevation-color-g: 170;
+            --light-elevation-color-b: 173;
+
+            --slight-outline-thickness: 1px;
+            --slight-outline-alpha: 0.3;
+            --dark-slight-outline-color: rgba(var(--dark-elevation-color-r), var(--dark-elevation-color-g), var(--dark-elevation-color-b), var(--slight-outline-alpha));
+            --light-slight-outline-color: rgba(var(--light-elevation-color-r), var(--light-elevation-color-g), var(--light-elevation-color-b), var(--slight-outline-alpha));
+
+            --dark-text-color: #EFEFF6;
+            --light-text-color: #27313f;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--full-margin);
+        }
+
+        button {
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+
+        .soft-corner {
+            border-radius: var(--border-radius);
+        }
+
+        .outlined-element {
+            border: var(--slight-outline-thickness) solid light-dark(var(--light-slight-outline-color), var(--dark-slight-outline-color));
+        }
+
+        .elevation-element {
+            position: relative;
+            background-color: light-dark(var(--light-background-color), var(--dark-background-color));
+            color: light-dark(var(--light-text-color), var(--dark-text-color));
+            overflow: hidden;
+            z-index: 0;
+            --elevation: 0;
+        }
+
+        .elevation-element::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: light-dark(rgba(var(--light-elevation-color-r), var(--light-elevation-color-g), var(--light-elevation-color-b), calc(var(--elevation) / var(--elevation-factor))), rgba(var(--dark-elevation-color-r), var(--dark-elevation-color-g), var(--dark-elevation-color-b), calc(var(--elevation) / var(--elevation-factor))));
+            mix-blend-mode: normal;
+            pointer-events: none;
+            z-index: -1;
+            transition: background-color 0.3s ease;
+        }
+
+        .hoverable-elevation-element {
+            transition: transform 0.15s ease;
+            cursor: pointer;
+        }
+
+        .hoverable-elevation-element:hover::after {
+            background-color: light-dark(rgba(var(--light-elevation-color-r), var(--light-elevation-color-g), var(--light-elevation-color-b), calc(calc(var(--elevation) + 1) / 5)), rgba(var(--dark-elevation-color-r), var(--dark-elevation-color-g), var(--dark-elevation-color-b), calc(calc(var(--elevation) + 1) / 5)));
+            mix-blend-mode: normal;
+        }
+
+        .hoverable-elevation-element:hover {
+            transform: scale(1.05);
+        }
+
+        .hoverable {
+            transition: transform 0.15s ease;
+        }
+
+        .hoverable:hover::after {
+            background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+            mix-blend-mode: normal;
+        }
+
+        .hoverable:hover {
+            transform: scale(1.05);
+        }
+
+        .clickable {
+            cursor: pointer;
+            box-shadow: 0px 0px 0px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            -webkit-box-shadow: 0px 0px 0px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            -moz-box-shadow: 0px 0px 0px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            transition: transform 0.1s ease;
+        }
+
+        .clickable:active {
+            transform: scale(0.95);
+            box-shadow: 0px 0px 5px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            -webkit-box-shadow: 0px 0px 5px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            -moz-box-shadow: 0px 0px 5px 0px light-dark(var(--light-clickable-shadow-color), var(--dark-clickable-shadow-color));
+            transition: transform 0.1s ease;
+        }
+
+        .row-container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .column-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .alignment-center {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .alignment-spaced {
+            justify-content: space-between;
+            gap: var(--full-margin);
+        }
+
+        .alignment-start {
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .alignment-end {
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .background-blur {
+            background-color: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            opacity: 0;
+            pointer-events: none;
+            min-height: 100%;
+            min-width: 100%;
+            position: absolute;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            transition: background-color 0.3s ease, backdrop-filter 0.3s ease, opacity 0.3s ease;
+        }
+
+        .background-blur-visible {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(1rem);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hidden-scrollbar-scroll-container {
+            overflow-y: scroll;
+            scrollbar-width: none;
+        }
+
+        .hidden-scrollbar-scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Custom styles for our application */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: calc(var(--full-margin) * 2);
+        }
+
+        .main-card {
+            --elevation: 2;
+            padding: calc(var(--full-margin) * 2);
+            gap: calc(var(--full-margin) * 2);
+        }
+
+        .title {
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: calc(var(--full-margin) * 2);
+        }
+
+        .api-config {
+            --elevation: 1;
+            padding: var(--full-margin);
+            gap: var(--full-margin);
+            margin-bottom: calc(var(--full-margin) * 2);
+        }
+
+        .api-config input {
+            flex: 1;
+            padding: var(--half-margin);
+            border: var(--slight-outline-thickness) solid light-dark(var(--light-slight-outline-color), var(--dark-slight-outline-color));
+            border-radius: var(--border-radius);
+            background-color: light-dark(var(--light-background-color), var(--dark-background-color));
+            color: light-dark(var(--light-text-color), var(--dark-text-color));
+            font-family: inherit;
+            font-size: var(--font-size-m);
+        }
+
+        .upload-section {
+            --elevation: 1;
+            padding: calc(var(--full-margin) * 2);
+            text-align: center;
+            gap: var(--full-margin);
+            border: 2px dashed light-dark(var(--light-slight-outline-color), var(--dark-slight-outline-color));
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: light-dark(var(--light-info-color), var(--dark-info-color));
+        }
+
+        .upload-section.dragover {
+            border-color: light-dark(var(--light-info-color), var(--dark-info-color));
+            background-color: light-dark(rgba(0, 156, 231, 0.1), rgba(0, 139, 215, 0.1));
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .button {
+            --elevation: 1;
+            padding: var(--full-margin) calc(var(--full-margin) * 1.5);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-m);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            gap: var(--half-margin);
+        }
+
+        .button-primary {
+            background-color: light-dark(var(--light-info-color), var(--dark-info-color));
+            color: white;
+        }
+
+        .button-success {
+            background-color: light-dark(var(--light-success-color), var(--dark-success-color));
+            color: white;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .preview-section {
+            text-align: center;
+            margin: calc(var(--full-margin) * 2) 0;
+        }
+
+        #imagePreview {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: var(--border-radius);
+            --elevation: 1;
+            display: none;
+        }
+
+        .result-section {
+            --elevation: 1;
+            padding: calc(var(--full-margin) * 1.5);
+            border-radius: var(--border-radius);
+            display: none;
+            gap: var(--full-margin);
+        }
+
+        .result-success {
+            border-left: 4px solid light-dark(var(--light-success-color), var(--dark-success-color));
+        }
+
+        .result-error {
+            border-left: 4px solid light-dark(var(--light-danger-color), var(--dark-danger-color));
+        }
+
+        .loading {
+            text-align: center;
+            color: light-dark(var(--light-text-color), var(--dark-text-color));
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .confidence-bar {
+            background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
+            border-radius: var(--border-radius);
+            height: 20px;
+            overflow: hidden;
+            --elevation: 0;
+            margin-bottom: var(--full-margin);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, light-dark(var(--light-info-color), var(--dark-info-color)), light-dark(var(--light-success-color), var(--dark-success-color)));
+            transition: width 0.5s ease;
+            border-radius: var(--border-radius);
+        }
+
+        .stool-type-info {
+            --elevation: 0;
+            padding: var(--full-margin);
+            background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.05));
+            border-radius: var(--border-radius);
+            border-left: 4px solid light-dark(var(--light-info-color), var(--dark-info-color));
+        }
+
+        .stool-type-info h4 {
+            margin: 0 0 var(--half-margin) 0;
+            font-weight: 600;
+        }
+
+        .stool-type-info p {
+            margin: 0;
+            font-size: var(--font-size-s);
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--full-margin);
+            }
+            
+            .main-card {
+                padding: var(--full-margin);
+            }
+            
+            .upload-section {
+                padding: var(--full-margin);
+            }
+            
+            .api-config {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="elevation-element soft-corner main-card column-container">
+            <h1 class="title">🧪 Stool Classification API Demo</h1>
+            
+            <div class="elevation-element soft-corner api-config row-container alignment-spaced">
+                <label for="apiUrl" style="font-weight: 500; display: flex; align-items: center;">API Base URL:</label>
+                <input type="text" id="apiUrl" value="http://localhost:5001" placeholder="http://localhost:5001">
+                <button onclick="testConnection()" class="elevation-element soft-corner clickable button button-primary">Test Connection</button>
+            </div>
+
+            <div class="elevation-element soft-corner upload-section column-container" id="uploadSection">
+                <h3 style="margin: 0; font-weight: 600;">📸 Upload Image for Classification</h3>
+                <p style="margin: 0; opacity: 0.8;">Drag and drop an image here, or click the button below</p>
+                <input type="file" id="fileInput" accept="image/*">
+                <div class="row-container alignment-center" style="gap: var(--full-margin);">
+                    <button class="elevation-element soft-corner clickable button button-primary" onclick="document.getElementById('fileInput').click()">
+                        Choose Image File
+                    </button>
+                    <button class="elevation-element soft-corner clickable button button-success" id="classifyButton" onclick="classifyImage()" disabled>
+                        Classify Image
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <img id="imagePreview" class="elevation-element soft-corner" alt="Image preview">
+            </div>
+
+            <div class="elevation-element soft-corner result-section" id="resultSection">
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        const apiUrlInput = document.getElementById('apiUrl');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const classifyButton = document.getElementById('classifyButton');
+        const resultSection = document.getElementById('resultSection');
+        const resultContent = document.getElementById('resultContent');
+        const uploadSection = document.getElementById('uploadSection');
+
+        // Drag and drop functionality
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select a valid image file.');
+                return;
+            }
+
+            selectedFile = file;
+            
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+
+            // Enable classify button
+            classifyButton.disabled = false;
+            
+            // Clear previous results
+            hideResult();
+        }
+
+        async function classifyImage() {
+            if (!selectedFile) {
+                showError('Please select an image file first.');
+                return;
+            }
+
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                showError('Please enter a valid API URL.');
+                return;
+            }
+
+            // Show loading state
+            classifyButton.disabled = true;
+            classifyButton.textContent = 'Classifying...';
+            showLoading();
+
+            try {
+                const formData = new FormData();
+                formData.append('imageFile', selectedFile);
+
+                const response = await fetch(`${apiUrl}/predict`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    showError(result.error);
+                } else {
+                    showSuccess(result);
+                }
+            } catch (error) {
+                showError(`Network error: ${error.message}`);
+            } finally {
+                classifyButton.disabled = false;
+                classifyButton.textContent = 'Classify Image';
+            }
+        }
+
+        function showLoading() {
+            resultSection.style.display = 'block';
+            resultSection.className = 'elevation-element soft-corner result-section';
+            resultContent.innerHTML = '<div class="loading">🔄 Processing image...</div>';
+        }
+
+        function showSuccess(result) {
+            resultSection.style.display = 'block';
+            resultSection.className = 'elevation-element soft-corner result-section result-success';
+            
+            const confidencePercent = (result.confidence * 100).toFixed(1);
+            const stoolTypeDescription = getStoolTypeDescription(result.predictedType);
+            
+            resultContent.innerHTML = `
+                <h3 style="margin: 0 0 var(--full-margin) 0; font-weight: 600;">✅ Classification Results</h3>
+                <p style="margin: var(--half-margin) 0;"><strong>Predicted Type:</strong> ${result.predictedType}</p>
+                <p style="margin: var(--half-margin) 0;"><strong>Confidence:</strong> ${confidencePercent}%</p>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${confidencePercent}%"></div>
+                </div>
+                <div class="stool-type-info">
+                    <h4>About ${result.predictedType}:</h4>
+                    <p>${stoolTypeDescription}</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            resultSection.style.display = 'block';
+            resultSection.className = 'elevation-element soft-corner result-section result-error';
+            resultContent.innerHTML = `
+                <h3 style="margin: 0 0 var(--full-margin) 0; font-weight: 600;">❌ Error</h3>
+                <p style="margin: 0;">${message}</p>
+            `;
+        }
+
+        function hideResult() {
+            resultSection.style.display = 'none';
+        }
+
+        function getStoolTypeDescription(type) {
+            const descriptions = {
+                'type-1': 'Separate hard lumps, like nuts (difficult to pass)',
+                'type-2': 'Sausage-like but lumpy',
+                'type-3': 'Sausage-like with cracks on the surface',
+                'type-4': 'Sausage-like, smooth and soft (ideal)',
+                'type-5': 'Soft blobs with clear-cut edges (easy to pass)',
+                'type-6': 'Mushy consistency with ragged edges',
+                'type-7': 'Entirely liquid, no solid pieces'
+            };
+            return descriptions[type] || 'Unknown stool type';
+        }
+
+        async function testConnection() {
+            const apiUrl = apiUrlInput.value.trim();
+            if (!apiUrl) {
+                showError('Please enter a valid API URL.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}/ping`);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showConnectionSuccess(`✅ Connection successful! ${result.message} (${new Date(result.timestamp).toLocaleTimeString()})`);
+                } else {
+                    showError(`❌ Connection failed. Status: ${response.status}`);
+                }
+            } catch (error) {
+                showError(`❌ Connection failed: ${error.message}`);
+            }
+        }
+
+        function showConnectionSuccess(message) {
+            resultSection.style.display = 'block';
+            resultSection.className = 'elevation-element soft-corner result-section result-success';
+            resultContent.innerHTML = `
+                <h3 style="margin: 0 0 var(--full-margin) 0; font-weight: 600;">✅ Connection Test</h3>
+                <p style="margin: 0;">${message}</p>
+            `;
+        }
+
+        // Load saved API URL from localStorage
+        const savedApiUrl = localStorage.getItem('classificationApiUrl');
+        if (savedApiUrl) {
+            apiUrlInput.value = savedApiUrl;
+        }
+
+        // Save API URL when changed
+        apiUrlInput.addEventListener('change', () => {
+            localStorage.setItem('classificationApiUrl', apiUrlInput.value);
+        });
+    </script>
+</body>
+</html> 
