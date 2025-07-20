@@ -58,7 +58,6 @@ namespace ClassificationApi.Controllers
             }
 
             return await _classificationService.ClassifyImageAsync(imageFile.OpenReadStream());
-
         }
     }
 }
