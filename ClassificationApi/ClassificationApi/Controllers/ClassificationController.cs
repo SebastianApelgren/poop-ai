@@ -22,15 +22,15 @@ namespace ClassificationApi.Controllers
             try
             {
                 string htmlContent = ResourceHelper.Instance.ReadAsStringAsync(Resource.Frontend.StoolClassificationFrontend).Result;
-                
+
                 // Get the external URL from forwarded headers, but hardcode https
                 string scheme = "https"; // Hardcoded to fix mixed content
                 string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value;
                 string prefix = Request.Headers["X-Forwarded-Prefix"].FirstOrDefault() ?? "";
-                
+
                 string requestUrl = $"{scheme}://{host}{prefix}";
                 htmlContent = htmlContent.Replace("http://localhost:5001", requestUrl);
-                
+
                 return Content(htmlContent, "text/html");
             }
             catch (Exception ex)
@@ -48,7 +48,18 @@ namespace ClassificationApi.Controllers
         [HttpPost("predict")]
         public async Task<ClassificationResponse> Predict(IFormFile imageFile)
         {
-            return await _classificationService.ClassifyImageAsync(imageFile);
+            // Validate input
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                return new ClassificationResponse
+                {
+                    Error = "No image file provided or file is empty."
+                };
+            }
+
+            return await _classificationService.ClassifyImageAsync(imageFile.OpenReadStream());
+
         }
     }
-} 
+}
+

@@ -28,21 +28,12 @@ namespace ClassificationApi.Services
             _modelService = modelService;
         }
 
-        public async Task<ClassificationResponse> ClassifyImageAsync(IFormFile imageFile)
+        public async Task<ClassificationResponse> ClassifyImageAsync(Stream imageStream)
         {
             try
             {
-                // Validate input
-                if (imageFile == null || imageFile.Length == 0)
-                {
-                    return new ClassificationResponse
-                    {
-                        Error = "No image file provided or file is empty."
-                    };
-                }
-
                 // Load and preprocess image
-                float[] preprocessedImage = await PreprocessImageAsync(imageFile);
+                float[] preprocessedImage = await PreprocessImageAsync(imageStream);
 
                 // Get model and run inference
                 InferenceSession model = await _modelService.GetModelAsync();
@@ -58,10 +49,9 @@ namespace ClassificationApi.Services
                 };
             }
         }
-
-        private async Task<float[]> PreprocessImageAsync(IFormFile imageFile)
+        
+        private async Task<float[]> PreprocessImageAsync(Stream imageStream)
         {
-            using Stream imageStream = imageFile.OpenReadStream();
             using Image<Rgb24> image = await Image.LoadAsync<Rgb24>(imageStream);
 
             // Resize image to 224x224 (same as Python code)
