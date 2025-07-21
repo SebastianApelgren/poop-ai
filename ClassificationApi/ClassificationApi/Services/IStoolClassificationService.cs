@@ -5,6 +5,6 @@ namespace ClassificationApi.Services
 {
     public interface IStoolClassificationService
     {
-        Task<ClassificationResponse> ClassifyImageAsync(IFormFile imageFile);
+        Task<ClassificationResponse> ClassifyImageAsync(Stream imageStream);
     }
 } 

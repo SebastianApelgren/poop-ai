@@ -6,6 +6,8 @@ namespace ClassificationApi
     {
         public static void Main(string[] args)
         {
+            Resources.ResourceHelper.Instance.VerifyResourceMappings();
+
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container
