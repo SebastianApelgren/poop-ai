@@ -6,6 +6,7 @@ __pycache__/
 .ipynb_checkpoints/
 datasets/
 training_instruction.rtf
+figures-report/
 
 # C-sharp and Visual Studio
 ClassificationApi/ClassificationApi/bin/*
