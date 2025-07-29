@@ -81,3 +81,5 @@ urllib3==2.4.0
 uvicorn==0.34.3
 wcwidth==0.2.13
 tabulate==0.9.0
+onnx
+onnxruntime
