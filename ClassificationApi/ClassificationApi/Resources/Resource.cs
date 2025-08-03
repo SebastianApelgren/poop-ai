@@ -32,7 +32,7 @@
         // Categories (no redundant "Resource" prefix)
         public static class Models
         {
-            public static readonly Resource StoolModel = new Resource("Models/stool_model.onnx");
+            public static readonly Resource StoolModel = new Resource("Models/kf_sttool_classification_628.onnx");
         }
 
         public static class Frontend
