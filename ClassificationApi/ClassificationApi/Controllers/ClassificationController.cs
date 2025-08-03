@@ -1,6 +1,7 @@
 using ClassificationApi.Models;
 using ClassificationApi.Resources;
 using ClassificationApi.Services;
+using EasyReasy;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClassificationApi.Controllers
@@ -10,18 +11,20 @@ namespace ClassificationApi.Controllers
     public class ClassificationController : ControllerBase
     {
         private readonly IStoolClassificationService _classificationService;
+        private readonly ResourceManager _resourceManager;
 
-        public ClassificationController(IStoolClassificationService classificationService)
+        public ClassificationController(IStoolClassificationService classificationService, ResourceManager resourceManager)
         {
             _classificationService = classificationService;
+            _resourceManager = resourceManager;
         }
 
         [HttpGet]
-        public IActionResult GetFrontend()
+        public async Task<IActionResult> GetFrontend()
         {
             try
             {
-                string htmlContent = ResourceHelper.Instance.ReadAsStringAsync(Resource.Frontend.StoolClassificationFrontend).Result;
+                string htmlContent = await _resourceManager.ReadAsStringAsync(ClassificationApi.Resources.Frontend.StoolClassificationFrontend);
 
                 // Get the external URL from forwarded headers, but hardcode https
                 string scheme = "https"; // Hardcoded to fix mixed content

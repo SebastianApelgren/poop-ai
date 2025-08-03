@@ -17,3 +17,7 @@ ClassificationApi/ClassificationApiTests/bin/*
 ClassificationApi/ClassificationApiTests/obj/*
 ClassificationApi/TestResults/*
 ClassificationApi/.vs
+
+# Environment and configuration files
+*.env
+test-config.env

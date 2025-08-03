@@ -19,34 +19,33 @@ namespace ClassificationApiTests
         }
 
         [TestMethod]
-        public async Task ClassifyImageAsync_WithNullFile_ReturnsError()
+        public async Task ClassifyImageAsync_WithNullStream_ReturnsError()
         {
             // Arrange
-            IFormFile? nullFile = null;
+            Stream? nullStream = null;
 
             // Act
-            ClassificationResponse result = await _service.ClassifyImageAsync(nullFile!);
+            ClassificationResponse result = await _service.ClassifyImageAsync(nullStream!);
 
             // Assert
             Assert.IsNotNull(result.Error);
-            Assert.IsTrue(result.Error!.Contains("No image file provided"));
+            Assert.IsTrue(result.Error!.Contains("Classification failed"));
             Assert.IsNull(result.PredictedType);
             Assert.AreEqual(0, result.Confidence);
         }
 
         [TestMethod]
-        public async Task ClassifyImageAsync_WithEmptyFile_ReturnsError()
+        public async Task ClassifyImageAsync_WithEmptyStream_ReturnsError()
         {
             // Arrange
-            Mock<IFormFile> mockFile = new Mock<IFormFile>();
-            mockFile.Setup(f => f.Length).Returns(0);
+            Stream emptyStream = new MemoryStream();
 
             // Act
-            ClassificationResponse result = await _service.ClassifyImageAsync(mockFile.Object);
+            ClassificationResponse result = await _service.ClassifyImageAsync(emptyStream);
 
             // Assert
             Assert.IsNotNull(result.Error);
-            Assert.IsTrue(result.Error!.Contains("No image file provided"));
+            Assert.IsTrue(result.Error!.Contains("Classification failed"));
             Assert.IsNull(result.PredictedType);
             Assert.AreEqual(0, result.Confidence);
         }

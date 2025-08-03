@@ -7,18 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EasyReasy" Version="1.0.0" />
+    <PackageReference Include="EasyReasy.ByteShelfProvider" Version="1.0.0" />
+    <PackageReference Include="EasyReasy.EnvironmentVariables" Version="1.2.0" />
     <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.10" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Resources\Frontend\StoolClassificationFrontend.html" />
-    <None Remove="Resources\stool_model.onnx" />
+    <None Remove="Resources\Models\kf_stool_classification_628.onnx" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\Frontend\StoolClassificationFrontend.html" />
-    <EmbeddedResource Include="Resources\Models\stool_model.onnx" />
+    <EmbeddedResource Include="Resources\Models\kf_stool_classification_628.onnx" />
   </ItemGroup>
 
 </Project>

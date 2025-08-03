@@ -1,14 +1,39 @@
 using ClassificationApi.Services;
+using ClassificationApi.Configuration;
+using EasyReasy;
+using EasyReasy.ByteShelfProvider;
+using EasyReasy.EnvironmentVariables;
+using System.Reflection;
 
 namespace ClassificationApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            Resources.ResourceHelper.Instance.VerifyResourceMappings();
-
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            // Validate all environment variables at startup using EasyReasy.EnvironmentVariables
+            EnvironmentVariableHelper.ValidateVariableNamesIn(typeof(EnvironmentVariable));
+
+            // Get ByteShelf configuration using EasyReasy.EnvironmentVariables
+            string byteShelfBaseUrl = EnvironmentVariable.ByteShelfBaseUrl.GetValue(minLength: 10);
+            
+            string byteShelfApiKey = EnvironmentVariable.ByteShelfApiKey.GetValue(minLength: 20);
+            
+            string cacheDirectory = EnvironmentVariable.ByteShelfCacheDir.GetValue();
+
+            // Create ByteShelf provider with caching
+            PredefinedResourceProvider byteShelfProvider = ByteShelfResourceProvider.CreatePredefined(
+                resourceCollectionType: typeof(ClassificationApi.Resources.Models),
+                baseUrl: byteShelfBaseUrl,
+                apiKey: byteShelfApiKey,
+                cache: new FileSystemCache(cacheDirectory));
+
+            // Validate all resources at startup using EasyReasy
+            ResourceManager resourceManager = await ResourceManager.CreateInstanceAsync(
+                assembly: Assembly.GetExecutingAssembly(),
+                predefinedProviders: byteShelfProvider);
 
             // Add services to the container
             builder.Services.AddControllers();
@@ -28,6 +53,7 @@ namespace ClassificationApi
             // Register our services
             builder.Services.AddSingleton<IModelService, ModelService>();
             builder.Services.AddScoped<IStoolClassificationService, StoolClassificationService>();
+            builder.Services.AddSingleton(resourceManager);
 
             WebApplication app = builder.Build();
 

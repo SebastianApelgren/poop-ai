@@ -1,4 +1,5 @@
 using ClassificationApi.Resources;
+using EasyReasy;
 using Microsoft.ML.OnnxRuntime;
 
 namespace ClassificationApi.Services
@@ -8,6 +9,12 @@ namespace ClassificationApi.Services
         private InferenceSession? _model;
         private readonly object _lockObject = new object();
         private bool _isLoading = false;
+        private readonly ResourceManager _resourceManager;
+
+        public ModelService(ResourceManager resourceManager)
+        {
+            _resourceManager = resourceManager;
+        }
 
         public bool IsModelLoaded => _model != null;
 
@@ -51,10 +58,10 @@ namespace ClassificationApi.Services
             try
             {
                 // Get the model resource
-                Resource modelResource = Resource.Models.StoolModel;
+                Resource modelResource = ClassificationApi.Resources.Models.StoolModel;
 
-                // Load the model from the embedded resource
-                using Stream modelStream = ResourceHelper.Instance.GetFileStream(modelResource);
+                // Load the model from the embedded resource using EasyReasy
+                using Stream modelStream = await _resourceManager.GetResourceStreamAsync(modelResource);
                 using MemoryStream memoryStream = new MemoryStream();
 
                 await modelStream.CopyToAsync(memoryStream);
