@@ -7,6 +7,8 @@ __pycache__/
 datasets/
 training_instruction.rtf
 report/
+trainedModels/
+
 
 # C-sharp and Visual Studio
 ClassificationApi/ClassificationApi/bin/*
