@@ -8,6 +8,7 @@ using System.Reflection;
 namespace ClassificationApiTests
 {
     [TestClass]
+    [TestCategory("Integration")]
     public class ResourceTests
     {
         private static ResourceManager? _resourceManager;

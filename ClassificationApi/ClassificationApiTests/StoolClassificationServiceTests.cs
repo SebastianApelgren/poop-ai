@@ -6,6 +6,7 @@ using Moq;
 namespace ClassificationApiTests
 {
     [TestClass]
+    [TestCategory("Unit")]
     public class StoolClassificationServiceTests
     {
         private Mock<IModelService> _mockModelService = null!;
