@@ -89,7 +89,7 @@ namespace ClassificationApi.Services
 
             // Create input tensor
             DenseTensor<float> inputTensor = new DenseTensor<float>(preprocessedImage, new int[] { 1, 3, ImageSize, ImageSize });
-            List<NamedOnnxValue> inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor("input", inputTensor) };
+            List<NamedOnnxValue> inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor("image", inputTensor) };
 
             // Run inference
             using IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = model.Run(inputs);
